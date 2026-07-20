@@ -1,0 +1,6 @@
+{
+  "name": "Vizion India Landing Page",
+  "description": "High-converting All-India education portal exam prep landing page with limited-time offer, urgency timer, and multi-channel lead options.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
