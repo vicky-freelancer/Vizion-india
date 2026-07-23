@@ -41,7 +41,7 @@ export const OPPORTUNITY_ITEMS: OpportunityItem[] = [
     positionLabel: "Lab Assistant / Technician",
     theme: "green",
     icon: FlaskConical,
-    imageUrl: "/lab-technician.jpg",
+    imageUrl: "/medical lab technician.jpg ",
     bullets: [
       "Work in modern labs with advanced technology.",
       "Handle lab instruments and test samples.",
@@ -54,7 +54,7 @@ export const OPPORTUNITY_ITEMS: OpportunityItem[] = [
     positionLabel: "Technician - Green Technology and Renewable Energy",
     theme: "orange",
     icon: Sun,
-    imageUrl: "/green-technology.jpg",
+    imageUrl: "/green energy technician (1).jpg",
     bullets: [
       "Work with solar, wind & renewable energy systems.",
       "Install, test and maintain green energy systems.",
