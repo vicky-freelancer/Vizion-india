@@ -14,7 +14,7 @@ export default function Navbar({ onApplyClick, onWhatsAppClick }: NavbarProps) {
         {/* Vizion India Brand Logo */}
         <div className="flex items-center gap-3 cursor-pointer" onClick={onApplyClick}>
           <img 
-            src="src/assets/images/vizion_india_logo_full_1784834608267.jpg" 
+            src="/assets/images/vizion_india_logo_full_1784834608267.jpg" 
             alt="Vizion India Logo" 
             className="h-11 sm:h-12 w-auto object-contain rounded transition-all"
             referrerPolicy="no-referrer"
