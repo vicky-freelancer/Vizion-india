@@ -15,7 +15,7 @@ export default function Footer() {
 
           <div className="flex justify-center mb-2">
             <img 
-              src="/logo2.jpeg" 
+              src="/logo2.jpg" 
               alt="Vizion India Logo" 
               className="h-12 sm:h-14 w-auto object-contain bg-white p-1 rounded-xl shadow-md"
               referrerPolicy="no-referrer"
