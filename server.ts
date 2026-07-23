@@ -37,16 +37,21 @@ async function startServer() {
   // Submit Lead endpoint
   app.post("/api/leads", async (req, res) => {
     try {
-      const { name, whatsapp, examInterest } = req.body;
+      const { name, whatsapp, qualification, position, city, examInterest } = req.body;
       if (!name || !whatsapp) {
         return res.status(400).json({ error: "Name and WhatsApp number are required" });
       }
+
+      const selectedPosition = position || examInterest || "Job Applicant";
 
       const newLead = {
         id: "lead_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
         name: name.trim(),
         whatsapp: whatsapp.trim(),
-        examInterest,
+        qualification: (qualification || "").trim(),
+        position: selectedPosition.trim(),
+        city: (city || "").trim(),
+        examInterest: selectedPosition.trim(), // Keep backwards compatibility
         timestamp: new Date().toISOString(),
         status: "Pending",
       };
@@ -79,13 +84,14 @@ async function startServer() {
               id: newLead.id,
               name: newLead.name,
               whatsapp: newLead.whatsapp,
-              examInterest: newLead.examInterest,
+              qualification: newLead.qualification,
+              position: newLead.position,
+              city: newLead.city,
+              examInterest: newLead.position, // Fallback key
               timestamp: newLead.timestamp
             }),
           });
 
-          // Google Web Apps return 302 redirects, but in server-side fetch,
-          // redirects are followed by default. If successful, it'll respond with 200 or similar.
           if (sheetRes.ok) {
             sheetStatus = "success";
             sheetMessage = "Successfully forwarded and saved in Google Sheets!";
@@ -188,6 +194,9 @@ async function startServer() {
       res.status(500).json({ error: err.message || "Failed to contact Google Sheet Web App" });
     }
   });
+
+  // Serve static assets from public directory
+  app.use(express.static(path.join(process.cwd(), "public")));
 
   // Vite Integration in Development
   if (process.env.NODE_ENV !== "production") {

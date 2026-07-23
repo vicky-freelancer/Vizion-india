@@ -1,34 +1,38 @@
+import React, { useState } from "react";
+import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
-import SocialProofStrip from "./components/SocialProofStrip";
-import WhyVizion from "./components/WhyVizion";
-import OfferDetails from "./components/OfferDetails";
-import ExamCategories from "./components/ExamCategories";
-import Testimonials from "./components/Testimonials";
-import UrgencyRepeat from "./components/UrgencyRepeat";
+import OpportunityCards from "./components/OpportunityCards";
+import JobLocationsSection from "./components/JobLocationsSection";
 import LeadFormSection from "./components/LeadFormSection";
-import FaqAccordion from "./components/FaqAccordion";
-import FinalCtaBanner from "./components/FinalCtaBanner";
 import Footer from "./components/Footer";
 import StickyMobileCTA from "./components/StickyMobileCTA";
 
 export default function App() {
-  // Smooth scroll handler targeting form section and auto-focusing the first input field
-  const handleScrollToForm = () => {
+  const [selectedPosition, setSelectedPosition] = useState<string>("Educational Counsellor");
+
+  // Smooth scroll handler targeting candidate form section and focusing candidate name field
+  const handleScrollToForm = (positionTitle?: string) => {
+    if (positionTitle) {
+      setSelectedPosition(positionTitle);
+    }
     const element = document.getElementById("lead-form-section");
     if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
       setTimeout(() => {
         const input = element.querySelector("input");
         if (input) {
           input.focus();
         }
-      }, 700);
+      }, 500);
     }
   };
 
-  // Safe WhatsApp click handler that avoids strict sandboxed iframe restrictions
+  // Safe WhatsApp click handler targeting Vizion India / Sukrith HR (+91 94452 85416)
   const handleWhatsAppRedirect = () => {
-    const url = "https://wa.me/919113242161?text=Hi%20Vizion%20India%2C%20I%20clicked%20your%20Meta%20Ad.%20I%20want%20to%20secure%20the%20%E2%82%B91200%20All-India%20Exam%20Prep%20Offer.%20Please%20activate%20my%20trial.";
+    const message = encodeURIComponent(
+      `Hi Vizion India / Sukrith Learning, I am interested in applying for job positions (${selectedPosition}). Please share application & interview details.`
+    );
+    const url = `https://wa.me/919445285416?text=${message}`;
     try {
       const link = document.createElement("a");
       link.href = url;
@@ -38,54 +42,55 @@ export default function App() {
       link.click();
       document.body.removeChild(link);
     } catch (e) {
-      // Fallback location change
       window.location.href = url;
     }
   };
 
+  // Website redirection
+  const handleWebsiteRedirect = () => {
+    window.open("https://www.vizionindia.in", "_blank", "noopener,noreferrer");
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-accent/20 selection:text-brand-accent pb-16 md:pb-0">
-      {/* 1. STICKY MOBILE CTA BAR (fixed bottom on mobile only) */}
-      <StickyMobileCTA
-        onCtaclick={handleScrollToForm}
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased pb-16 md:pb-0">
+      
+      {/* 1. TOP NAVBAR */}
+      <Navbar
+        onApplyClick={() => handleScrollToForm()}
         onWhatsAppClick={handleWhatsAppRedirect}
       />
 
-      {/* 2. HERO SECTION */}
+      {/* 2. MAIN HERO HIRING BANNER */}
       <HeroSection
-        onCtaclick={handleScrollToForm}
+        onApplyClick={() => handleScrollToForm()}
         onWhatsAppClick={handleWhatsAppRedirect}
       />
 
-      {/* 3. SOCIAL PROOF STRIP */}
-      <SocialProofStrip />
+      {/* 3. EXPLORE OPPORTUNITIES - 4 JOB CARDS GRID */}
+      <OpportunityCards
+        onApplyClick={(posTitle) => handleScrollToForm(posTitle)}
+      />
 
-      {/* 5. WHY VIZION INDIA */}
-      <WhyVizion />
+      {/* 4. JOB LOCATIONS SECTION (Thanjavur, Perambalur, Trichy, Ariyalur & Regional Centers) */}
+      <JobLocationsSection
+        onApplyClick={() => handleScrollToForm()}
+      />
 
-      {/* 4. THE OFFER / WHAT'S INCLUDED */}
-      <OfferDetails onCtaclick={handleScrollToForm} />
+      {/* 5. CANDIDATE APPLICATION FORM (5 REQUIRED FIELDS) */}
+      <LeadFormSection
+        selectedPosition={selectedPosition}
+        onWhatsAppClick={handleWhatsAppRedirect}
+      />
 
-      {/* 6. EXAM CATEGORIES GRID */}
-      <ExamCategories />
-
-      {/* 7. TESTIMONIAL / RESULTS SECTION */}
-      <Testimonials />
-
-      {/* 8. URGENCY + SCARCITY REPEAT BLOCK */}
-      <UrgencyRepeat onCtaclick={handleScrollToForm} />
-
-      {/* 9. SIMPLE LEAD FORM & WHATSAPP TOGGLE */}
-      <LeadFormSection onWhatsAppClick={handleWhatsAppRedirect} />
-
-      {/* 10. FAQ ACCORDION */}
-      <FaqAccordion />
-
-      {/* 11. FINAL CTA BANNER */}
-      <FinalCtaBanner onCtaclick={handleScrollToForm} />
-
-      {/* 12. FOOTER */}
+      {/* 6. CORPORATE FOOTER */}
       <Footer />
+
+      {/* 7. STICKY MOBILE CTA BAR */}
+      <StickyMobileCTA
+        onCtaclick={() => handleScrollToForm()}
+        onWhatsAppClick={handleWhatsAppRedirect}
+      />
+      
     </div>
   );
 }

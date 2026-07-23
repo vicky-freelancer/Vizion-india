@@ -1,226 +1,164 @@
-import { useState, useEffect } from "react";
-import { motion } from "motion/react";
-import { Flame, MessageSquare, ShieldCheck, Users, Clock } from "lucide-react";
-import VizionLogo from "./VizionLogo";
+import React from "react";
+import { 
+  UserCheck, 
+  GraduationCap, 
+  MapPin, 
+  Calendar, 
+  ClipboardCheck, 
+  MessageSquare, 
+  ArrowRight,
+  Quote
+} from "lucide-react";
 
 interface HeroSectionProps {
-  onCtaclick: () => void;
+  onApplyClick: () => void;
   onWhatsAppClick: () => void;
 }
 
-export default function HeroSection({ onCtaclick, onWhatsAppClick }: HeroSectionProps) {
-  // Countdown Timer Logic (Counts down to midnight of current day)
-  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
-
-  useEffect(() => {
-    const updateCountdown = () => {
-      const now = new Date();
-      const endOfDay = new Date();
-      endOfDay.setHours(23, 59, 59, 999);
-
-      const diff = endOfDay.getTime() - now.getTime();
-      if (diff <= 0) {
-        setTimeLeft({ hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
-
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-
-      setTimeLeft({ hours, minutes, seconds });
-    };
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Seat Scarcity Logic (Simulates slow decrement for authenticity)
-  const [seatsLeft, setSeatsLeft] = useState(994); // Starts under the target 1000 threshold for ultra high urgency
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSeatsLeft((prev) => {
-        if (prev <= 12) return 12; // Keep minimum seats
-        // 10% chance to decrement a seat every few seconds
-        const shouldDecrement = Math.random() > 0.85;
-        return shouldDecrement ? prev - 1 : prev;
-      });
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const totalSeats = 1000;
-  const percentageFilled = ((totalSeats - seatsLeft) / totalSeats) * 100;
-
+export default function HeroSection({ onApplyClick, onWhatsAppClick }: HeroSectionProps) {
   return (
-    <header className="relative overflow-hidden bg-gradient-to-b from-slate-900 to-brand-blue-dark text-white pb-16 pt-6 px-4">
-      {/* Background radial accent */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,107,53,0.1),transparent_45%)] pointer-events-none" />
-
-      <div className="max-w-6xl mx-auto relative z-10">
-        {/* Navigation / Header Brand Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10 pb-6 mb-12">
-          <div className="flex flex-col items-center sm:items-start gap-1">
-            <VizionLogo light={true} />
-            <p className="text-[10px] text-slate-400 font-mono tracking-wider sm:pl-16">eduonline.vizionindia.in</p>
-          </div>
-          <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm px-4 py-1.5 rounded-full border border-white/10">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <p className="text-xs font-medium text-slate-200">
-              Empowering Students Across India
-            </p>
-          </div>
-        </div>
-
-        {/* Hero Main Block */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          {/* Column 1: Copywriting and CTA */}
-          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            {/* Trust badge */}
-            <span className="bg-brand-accent text-white px-3 py-1.5 text-[11px] font-black uppercase tracking-widest rounded mb-6 inline-flex items-center gap-2 w-max shadow-sm">
-              <Users className="w-3.5 h-3.5" />
-              Trusted by 1,00,000+ Students Across India
-            </span>
-
+    <section className="bg-gradient-to-br from-slate-50 via-white to-blue-50/40 border-b border-slate-200 overflow-hidden relative">
+      <div className="max-w-7xl mx-auto px-4 py-8 lg:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
+          
+          {/* LEFT CONTENT COLUMN (7 cols) */}
+          <div className="lg:col-span-7 space-y-5">
+            
             {/* Headline */}
-            <h2 className="font-display font-black text-5xl sm:text-6xl md:text-[5.5rem] leading-[0.9] text-white tracking-tighter uppercase">
-              Crack Your <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-amber-300">Dream Exam.</span>
-            </h2>
+            <div className="space-y-1">
+              <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-blue-950 uppercase leading-none">
+                WE'RE <span className="text-emerald-600">HIRING!</span>
+              </h1>
+              <div className="flex items-center gap-2 pt-1">
+                <span className="font-extrabold text-slate-800 text-sm tracking-wider uppercase bg-slate-200 px-2 py-0.5 rounded">FOR</span>
+                <div className="h-0.5 bg-blue-950 flex-1 rounded-full" />
+              </div>
+            </div>
 
-            {/* Subheadline */}
-            <p className="text-lg sm:text-xl text-blue-100 max-w-xl mx-auto lg:mx-0 leading-snug font-medium">
-              JEE, NEET, UPSC & 15+ exams. Get expert-curated study material starting at just <span className="text-white font-bold underline decoration-brand-accent decoration-wavy">₹1200</span> <span className="line-through opacity-50">₹5999</span>.
-            </p>
+            {/* Roles List Headline */}
+            <div className="space-y-1 font-black text-slate-900 text-sm sm:text-base md:text-lg leading-snug uppercase tracking-tight">
+              <p className="text-blue-900">
+                EDUCATIONAL COUNSELLOR <span className="text-slate-400 font-normal">|</span> MEDICAL LAB TECHNICIAN
+              </p>
+              <p className="text-amber-700">
+                TECHNICIAN – GREEN TECHNOLOGY & RENEWABLE ENERGY
+              </p>
+              <p className="text-purple-900">
+                IIT-JEE (MAIN & ADVANCED) / NEET FACULTY
+              </p>
+            </div>
 
-            {/* CTA Group */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={onCtaclick}
-                className="w-full sm:w-auto bg-brand-accent hover:bg-brand-accent-hover text-white font-display font-black text-lg px-8 py-4.5 rounded-xl shadow-lg shadow-brand-accent/30 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer uppercase tracking-tighter"
+            {/* Tagline */}
+            <div className="space-y-1">
+              <p className="text-blue-950 font-black text-sm sm:text-base tracking-tight uppercase">
+                Join Vizion India – Be Future Ready
+              </p>
+              <p className="text-emerald-700 font-extrabold text-xs sm:text-sm tracking-wide uppercase">
+                BUILD YOUR CAREER WITH Vizion India
+              </p>
+            </div>
+
+            {/* 5 Key Attribute Badges matching screenshot */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 pt-2">
+              
+              {/* Badge 1: Position */}
+              <div className="bg-white border border-slate-200 p-2 sm:p-2.5 rounded-xl text-center shadow-sm flex flex-col items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-blue-950 text-white flex items-center justify-center mb-1">
+                  <UserCheck className="w-4 h-4" />
+                </div>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">POSITION</span>
+                <span className="text-xs font-black text-slate-900 leading-tight block">Multiple Roles</span>
+              </div>
+
+              {/* Badge 2: Qualification */}
+              <div className="bg-white border border-slate-200 p-2 sm:p-2.5 rounded-xl text-center shadow-sm flex flex-col items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-blue-950 text-white flex items-center justify-center mb-1">
+                  <GraduationCap className="w-4 h-4" />
+                </div>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">QUALIFICATION</span>
+                <span className="text-[11px] font-black text-slate-900 leading-tight block">Relevant Degree / Diploma</span>
+              </div>
+
+              {/* Badge 3: Location */}
+              <div className="bg-white border border-slate-200 p-2 sm:p-2.5 rounded-xl text-center shadow-sm flex flex-col items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-blue-950 text-white flex items-center justify-center mb-1">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">LOCATION</span>
+                <span className="text-[11px] font-black text-slate-900 leading-tight block">Thanjavur, Perambalur, Trichy, Ariyalur & TN</span>
+              </div>
+
+              {/* Badge 4: Age Limit */}
+              <div className="bg-white border border-slate-200 p-2 sm:p-2.5 rounded-xl text-center shadow-sm flex flex-col items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-blue-950 text-white flex items-center justify-center mb-1">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">AGE LIMIT</span>
+                <span className="text-xs font-black text-slate-900 leading-tight block">21 to 35 Years</span>
+              </div>
+
+              {/* Badge 5: Registration */}
+              <div className="bg-white border border-slate-200 p-2 sm:p-2.5 rounded-xl text-center shadow-sm flex flex-col items-center justify-center col-span-2 sm:col-span-1">
+                <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center mb-1">
+                  <ClipboardCheck className="w-4 h-4" />
+                </div>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">REGISTRATION</span>
+                <span className="text-xs font-black text-emerald-600 leading-tight block uppercase">MANDATORY</span>
+              </div>
+
+            </div>
+
+            {/* CTA Buttons Row under badges */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              <button
+                onClick={onApplyClick}
+                className="bg-blue-950 hover:bg-blue-900 text-white font-black text-sm px-6 py-3.5 rounded-xl shadow-lg uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-95"
               >
-                <Flame className="w-5 h-5 fill-current animate-bounce" />
-                Claim My 80% Discount
-              </motion.button>
+                <span>APPLY NOW!</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              {/* WhatsApp Button replacing vizionindia.in button */}
+              <button
                 onClick={onWhatsAppClick}
-                className="w-full sm:w-auto bg-transparent border-2 border-white/20 hover:border-white/40 hover:bg-white/5 text-white font-display font-black text-base px-6 py-4.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer uppercase tracking-tighter"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm px-5 py-3.5 rounded-full flex items-center justify-center gap-2.5 shadow-md cursor-pointer transition-all"
               >
-                <MessageSquare className="w-5 h-5 text-emerald-400 fill-emerald-400/20" />
-                Chat on WhatsApp
-              </motion.button>
+                <MessageSquare className="w-4 h-4 fill-current flex-shrink-0" />
+                <div className="text-left leading-tight">
+                  <span className="font-black block text-xs sm:text-sm">Chat on WhatsApp</span>
+                  <span className="text-[10px] font-medium text-emerald-100 block">+91 94452 85416</span>
+                </div>
+              </button>
             </div>
 
-            {/* Security trust note */}
-            <div className="flex items-center justify-center lg:justify-start gap-5 text-xs text-slate-400 pt-1">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" /> Secure Payment
-              </span>
-              <span>•</span>
-              <span>Immediate Activation</span>
-              <span>•</span>
-              <span>★ 4.9/5 Student Rating</span>
-            </div>
           </div>
 
-          {/* Column 2: Interactive Scarcity Card */}
-          <div className="lg:col-span-5 w-full max-w-md mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="bg-slate-800/80 backdrop-blur-md border border-slate-700 p-6 rounded-2xl shadow-2xl relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 bg-brand-accent text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-bl-lg">
-                80% OFF Deal
-              </div>
+          {/* RIGHT GRAPHIC COLUMN (5 cols) - Visual matching screenshot */}
+          <div className="lg:col-span-5 relative">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-900 group">
+              {/* Image background: climbers towards goal & windmills */}
+              <img 
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1000" 
+                alt="Career Growth & Team Success" 
+                className="w-full h-[320px] sm:h-[380px] object-cover object-center brightness-90 group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-950/20 to-transparent" />
 
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">
-                    Special Package Offer
-                  </h3>
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-4xl font-extrabold font-display text-white">₹1200</span>
-                    <span className="text-lg text-slate-500 line-through">₹5999</span>
-                    <span className="bg-emerald-500/10 text-emerald-400 text-xs font-bold px-2 py-0.5 rounded">
-                      Save ₹4799
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 mt-2">
-                    One-time payment. Full syllabus prep bundle included.
-                  </p>
-                </div>
-
-                {/* Countdown Timer Widget */}
-                <div className="bg-slate-900/80 p-5 rounded-2xl border border-slate-700/80 shadow-inner">
-                  <div className="flex items-center gap-2 text-slate-300 text-[10px] font-black uppercase tracking-widest mb-3.5">
-                    <Clock className="w-3.5 h-3.5 text-brand-accent animate-pulse" />
-                    Offer Ends In
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 font-mono">
-                      <div className="flex flex-col items-center">
-                        <span className="bg-white/10 text-white text-3xl font-black px-3 py-2 rounded-lg border border-white/5 shadow-sm min-w-[54px] text-center">
-                          {String(timeLeft.hours).padStart(2, "0")}
-                        </span>
-                        <span className="text-[9px] uppercase font-bold text-slate-400 mt-1.5 tracking-wider">Hrs</span>
-                      </div>
-                      <span className="text-xl font-bold text-slate-600 mb-5">:</span>
-                      <div className="flex flex-col items-center">
-                        <span className="bg-white/10 text-white text-3xl font-black px-3 py-2 rounded-lg border border-white/5 shadow-sm min-w-[54px] text-center">
-                          {String(timeLeft.minutes).padStart(2, "0")}
-                        </span>
-                        <span className="text-[9px] uppercase font-bold text-slate-400 mt-1.5 tracking-wider">Min</span>
-                      </div>
-                      <span className="text-xl font-bold text-slate-600 mb-5">:</span>
-                      <div className="flex flex-col items-center">
-                        <span className="bg-brand-accent text-white text-3xl font-black px-3 py-2 rounded-lg shadow-md shadow-brand-accent/20 min-w-[54px] text-center animate-pulse">
-                          {String(timeLeft.seconds).padStart(2, "0")}
-                        </span>
-                        <span className="text-[9px] uppercase font-bold text-brand-accent mt-1.5 tracking-wider">Sec</span>
-                      </div>
-                    </div>
-
-                    <div className="border-l border-slate-700/80 pl-5 text-right flex flex-col justify-center">
-                      <span className="text-[9px] uppercase font-black tracking-widest text-slate-400">Total discount</span>
-                      <span className="text-2xl font-black text-brand-accent tracking-tighter uppercase">80% OFF</span>
-                      <span className="text-[10px] font-bold text-emerald-400">Locked</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Seats Left Scarcity */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs font-semibold">
-                    <span className="text-slate-300 uppercase tracking-wider">Seats Left Scarcity</span>
-                    <span className="text-brand-accent font-mono animate-pulse">
-                      Only {seatsLeft} / {totalSeats} seats remaining!
-                    </span>
-                  </div>
-                  <div className="h-3 w-full bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-700">
-                    <motion.div
-                      initial={{ width: "0%" }}
-                      animate={{ width: `${percentageFilled}%` }}
-                      transition={{ duration: 1.2, ease: "easeOut" }}
-                      className="h-full rounded-full bg-gradient-to-r from-brand-accent to-amber-500 shadow-[0_0_8px_rgba(255,107,53,0.5)]"
-                    />
-                  </div>
-                  <p className="text-[11px] text-slate-400 text-center">
-                    Due to extremely high traffic from Meta Ads, seats are filling fast.
+              {/* Floating Quote Box matching screenshot */}
+              <div className="absolute bottom-4 left-4 right-4 bg-blue-950/90 backdrop-blur-md border border-blue-800 text-white p-4 rounded-2xl shadow-xl">
+                <div className="flex items-start gap-2">
+                  <Quote className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs sm:text-sm font-semibold leading-snug">
+                    Grab the opportunity to accomplish your desire and goals by{" "}
+                    <span className="text-amber-400 font-extrabold">Learning while you Earn.</span>
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
+
         </div>
       </div>
-    </header>
+    </section>
   );
 }

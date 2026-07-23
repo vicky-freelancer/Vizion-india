@@ -1,5 +1,6 @@
+import React from "react";
 import { motion } from "motion/react";
-import { MessageSquare, Flame } from "lucide-react";
+import { MessageSquare, Briefcase } from "lucide-react";
 
 interface StickyMobileCTAProps {
   onCtaclick: () => void;
@@ -8,25 +9,24 @@ interface StickyMobileCTAProps {
 
 export default function StickyMobileCTA({ onCtaclick, onWhatsAppClick }: StickyMobileCTAProps) {
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-200 p-3 z-50 shadow-[0_-8px_30px_rgb(0,0,0,0.1)] flex gap-3">
-      {/* Primary 80% OFF claim button */}
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 p-2.5 z-50 shadow-[0_-8px_30px_rgb(0,0,0,0.3)] flex gap-2">
       <motion.button
         whileTap={{ scale: 0.96 }}
         onClick={onCtaclick}
-        className="flex-1 bg-brand-accent hover:bg-brand-accent-hover text-white font-display font-bold text-sm py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-brand-accent/20 cursor-pointer"
+        className="flex-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs py-3 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-md uppercase tracking-wide cursor-pointer"
       >
-        <Flame className="w-4 h-4 fill-current animate-pulse" />
-        Claim 80% OFF Now
+        <Briefcase className="w-4 h-4 fill-slate-950" />
+        <span>Apply Now Form</span>
       </motion.button>
 
-      {/* Immediate WhatsApp chat trigger */}
       <motion.button
         whileTap={{ scale: 0.96 }}
         onClick={onWhatsAppClick}
-        className="bg-emerald-500 hover:bg-emerald-600 text-white p-3.5 rounded-xl flex items-center justify-center shadow-md shadow-emerald-500/20 cursor-pointer"
-        aria-label="Chat on WhatsApp"
+        className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-3 px-3.5 rounded-xl flex items-center justify-center gap-1 shadow-md cursor-pointer"
+        aria-label="WhatsApp HR Desk"
       >
-        <MessageSquare className="w-5 h-5 fill-white/15" />
+        <MessageSquare className="w-4 h-4 fill-white/20" />
+        <span>HR WhatsApp</span>
       </motion.button>
     </div>
   );

@@ -1,42 +1,65 @@
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
-  MessageSquare, 
   ClipboardList, 
   CheckCircle2, 
   AlertCircle, 
-  Phone, 
   Send,
-  RefreshCw
+  RefreshCw,
+  User,
+  Phone,
+  GraduationCap,
+  Briefcase,
+  MapPin,
+  MessageSquare
 } from "lucide-react";
 
 interface LeadFormSectionProps {
   onWhatsAppClick: () => void;
+  selectedPosition?: string;
 }
 
-export default function LeadFormSection({ onWhatsAppClick }: LeadFormSectionProps) {
-  const [activeTab, setActiveTab] = useState<"form" | "whatsapp">("form");
+export default function LeadFormSection({ onWhatsAppClick, selectedPosition }: LeadFormSectionProps) {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
-  const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
+  const [errors, setErrors] = useState<{ name?: string; phone?: string; qualification?: string; position?: string; city?: string }>({});
   
   const [formData, setFormData] = useState({
     name: "",
     whatsapp: "",
-    examInterest: "JEE Entrance",
+    qualification: "",
+    position: selectedPosition || "Educational Counsellor",
+    city: "",
   });
 
   const [sheetSyncStatus, setSheetSyncStatus] = useState<{ status: string; message: string } | null>(null);
 
+  // Sync selectedPosition from parent when Apply Now button is clicked
+  useEffect(() => {
+    if (selectedPosition) {
+      setFormData((prev) => ({ ...prev, position: selectedPosition }));
+    }
+  }, [selectedPosition]);
+
   const validate = () => {
-    const newErrors: { name?: string; phone?: string } = {};
+    const newErrors: { name?: string; phone?: string; qualification?: string; position?: string; city?: string } = {};
     if (!formData.name.trim()) {
-      newErrors.name = "Full name is required";
+      newErrors.name = "Candidate name is required";
     }
     const cleanPhone = formData.whatsapp.replace(/\D/g, "");
     if (cleanPhone.length < 10) {
       newErrors.phone = "Enter a valid 10-digit WhatsApp number";
     }
+    if (!formData.qualification.trim()) {
+      newErrors.qualification = "Qualification is required";
+    }
+    if (!formData.position.trim()) {
+      newErrors.position = "Please select or specify a position";
+    }
+    if (!formData.city.trim()) {
+      newErrors.city = "City is required";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -51,7 +74,7 @@ export default function LeadFormSection({ onWhatsAppClick }: LeadFormSectionProp
     let success = false;
     
     try {
-      // First, try submitting to the local server API endpoint (if it exists)
+      // Submit to server endpoint /api/leads
       const res = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -69,59 +92,52 @@ export default function LeadFormSection({ onWhatsAppClick }: LeadFormSectionProp
         throw new Error(`Server responded with status ${res.status}`);
       }
     } catch (err: any) {
-      console.warn("Express server API failed or is unavailable (common on serverless environments like Vercel). Attempting direct client-side fallback to Google Sheets...", err);
+      console.warn("Server API error, falling back to direct Google Sheets connection...", err);
       
-      // Direct client-side submission to Google Sheets Web App as robust fallback
       const directUrl = "https://script.google.com/macros/s/AKfycby-23gdlNE4Nc8xi-HcTRM0LpPtFBzA3HE29dND6ZPpiIbu-zmICJWuNE__vUTaXvQ45A/exec";
       
       const payload = {
         id: "lead_client_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
         name: formData.name.trim(),
         whatsapp: formData.whatsapp.trim(),
-        examInterest: formData.examInterest,
+        qualification: formData.qualification.trim(),
+        position: formData.position.trim(),
+        city: formData.city.trim(),
+        examInterest: formData.position.trim(),
         timestamp: new Date().toISOString()
       };
 
       try {
-        // Try submitting with text/plain to avoid CORS preflight OPTIONS request
         await fetch(directUrl, {
           method: "POST",
-          headers: { 
-            "Content-Type": "text/plain;charset=utf-8" 
-          },
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payload),
         });
 
         setFormSubmitted(true);
         setSheetSyncStatus({
           status: "success",
-          message: "Lead submitted successfully and synced directly with Google Sheets!"
+          message: "Application submitted successfully to Vizion India HR desk!"
         });
         success = true;
       } catch (sheetErr: any) {
-        console.warn("Direct JSON POST failed. Retrying with mode: 'no-cors'...", sheetErr);
-        
         try {
-          // Last resort fallback: send with no-cors so request is guaranteed to dispatch to Google Sheets,
-          // ignoring opaque redirect or CORS failure in the browser
           await fetch(directUrl, {
             method: "POST",
             mode: "no-cors",
-            headers: { 
-              "Content-Type": "text/plain;charset=utf-8" 
-            },
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify(payload),
           });
 
           setFormSubmitted(true);
           setSheetSyncStatus({
             status: "success",
-            message: "Lead received and locked in Google Sheets!"
+            message: "Application received by HR team!"
           });
           success = true;
         } catch (noCorsErr: any) {
           console.error("All submission methods failed:", noCorsErr);
-          setErrors({ phone: "Network error submitting lead. Please try WhatsApp verification instead!" });
+          setErrors({ phone: "Network error submitting application. Please try contacting HR directly via WhatsApp." });
         }
       }
     } finally {
@@ -132,313 +148,294 @@ export default function LeadFormSection({ onWhatsAppClick }: LeadFormSectionProp
     if (success && typeof window !== "undefined" && (window as any).fbq) {
       try {
         (window as any).fbq("track", "Lead", {
-          content_name: "Exam Prep 80% Discount Lead",
-          value: 1200,
-          currency: "INR",
-          predicted_exam: formData.examInterest,
-        });
-        console.log("Meta Pixel 'Lead' event tracked successfully.");
-      } catch (e) {
-        console.warn("Meta Pixel tracking failed: ", e);
-      }
-    } else {
-      console.log("Simulated Meta Pixel: fbq('track', 'Lead') called with values: ", formData);
-    }
-  };
-
-  const handleWhatsAppAction = () => {
-    // Trigger Meta Pixel lead tracking for direct chat button click too
-    if (typeof window !== "undefined" && (window as any).fbq) {
-      try {
-        (window as any).fbq("track", "Lead", {
-          content_name: "WhatsApp Click-to-Chat Lead",
-          value: 1200,
+          content_name: `Candidate Application - ${formData.position}`,
+          value: 1,
           currency: "INR",
         });
       } catch (e) {}
     }
-    onWhatsAppClick();
   };
 
   return (
-    <section id="lead-form-section" className="py-16 px-4 bg-slate-50 border-b border-slate-100">
-      <div className="max-w-xl mx-auto">
+    <section id="lead-form-section" className="py-16 px-4 bg-slate-900 text-white border-y border-slate-800">
+      <div className="max-w-2xl mx-auto">
         
         {/* Section Header */}
-        <div className="text-center space-y-3 mb-8">
-          <span className="text-brand-accent font-mono text-xs uppercase font-extrabold tracking-widest bg-brand-accent/10 px-3.5 py-1.5 rounded-full">
-            Claim Your Offer
+        <div className="text-center space-y-3 mb-10">
+          <span className="text-amber-400 font-extrabold text-xs uppercase tracking-widest bg-amber-400/10 border border-amber-400/20 px-4 py-1.5 rounded-full inline-flex items-center gap-1.5">
+            <ClipboardList className="w-3.5 h-3.5" /> CANDIDATE APPLICATION FORM
           </span>
-          <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight">
-            Unlock the ₹1200 Deal
+          <h2 className="font-black text-2xl sm:text-3xl text-white tracking-tight">
+            Apply to Vizion India
           </h2>
-          <p className="text-slate-500 text-xs sm:text-sm max-w-xl mx-auto">
-            Choose how you would like to secure your All-India Exam prep package below. Both methods trigger instantly.
+          <p className="text-slate-300 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
+            Fill out the details below to submit your job application. Our HR recruitment team will review your credentials and contact you directly via WhatsApp.
           </p>
         </div>
 
-        {/* Tab Selector */}
-        <div className="bg-slate-200/60 p-1.5 rounded-2xl mb-8 flex gap-1 text-xs sm:text-sm font-bold">
-          <button
-            onClick={() => { setActiveTab("form"); setFormSubmitted(false); }}
-            className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${
-              activeTab === "form"
-                ? "bg-white text-brand-blue shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            <ClipboardList className="w-4 h-4 text-brand-blue" />
-            <span>Fill Quick Form</span>
-          </button>
+        {/* Application Form */}
+        <div className="bg-slate-800/90 border border-slate-700/80 p-6 sm:p-10 rounded-3xl shadow-2xl relative overflow-hidden backdrop-blur-sm">
           
-          <button
-            onClick={() => setActiveTab("whatsapp")}
-            className={`flex-1 py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${
-              activeTab === "whatsapp"
-                ? "bg-emerald-500 text-white shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            <MessageSquare className="w-4 h-4 text-emerald-100 fill-emerald-100/10" />
-            <span>Chat on WhatsApp</span>
-          </button>
-        </div>
+          <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-amber-400 via-blue-500 to-emerald-400" />
 
-        {/* Dynamic Display */}
-        <AnimatePresence mode="wait">
-          {activeTab === "form" && (
-            <motion.div
-              key="form-tab"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-            >
-              {!formSubmitted ? (
-                <form
-                  onSubmit={handleFormSubmit}
-                  className="bg-white border border-slate-200 p-6 sm:p-8 rounded-3xl shadow-xl space-y-5"
-                >
-                  <h3 className="font-display font-black text-xs uppercase tracking-widest text-slate-400 border-b border-slate-100 pb-3">
-                    Student Details Form
-                  </h3>
-
-                  {/* Name field */}
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase tracking-wider mb-1 block opacity-60">
-                      Student / Parent Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Amit Sharma"
-                      value={formData.name}
-                      onChange={(e) => {
-                        setFormData({ ...formData, name: e.target.value });
-                        if (errors.name) setErrors({ ...errors, name: undefined });
-                      }}
-                      className={`w-full bg-slate-100/80 border-none px-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:bg-slate-50 ${
-                        errors.name ? "focus:ring-red-400" : "focus:ring-brand-accent"
-                      }`}
-                    />
-                    {errors.name && (
-                      <p className="text-xs text-red-500 flex items-center gap-1.5 font-medium mt-1">
-                        <AlertCircle className="w-3.5 h-3.5" /> {errors.name}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Phone / WhatsApp Number field */}
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase tracking-wider mb-1 block opacity-60">
-                      WhatsApp Phone Number
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 text-sm font-black border-r border-slate-200/60 pr-2.5">
-                        +91
-                      </div>
-                      <input
-                        type="tel"
-                        maxLength={10}
-                        required
-                        placeholder="10-digit WhatsApp No."
-                        value={formData.whatsapp}
-                        onChange={(e) => {
-                          const val = e.target.value.replace(/\D/g, "");
-                          setFormData({ ...formData, whatsapp: val });
-                          if (errors.phone) setErrors({ ...errors, phone: undefined });
-                        }}
-                        className={`w-full bg-slate-100/80 border-none pl-16 pr-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:bg-slate-50 ${
-                          errors.phone ? "focus:ring-red-400" : "focus:ring-brand-accent"
-                        }`}
-                      />
-                    </div>
-                    {errors.phone ? (
-                      <p className="text-xs text-red-500 flex items-center gap-1.5 font-medium mt-1">
-                        <AlertCircle className="w-3.5 h-3.5" /> {errors.phone}
-                      </p>
-                    ) : (
-                      <p className="text-[10px] text-slate-400 mt-1">
-                        Activation confirmation instructions will be sent to this WhatsApp number.
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Exam/Course interest field */}
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase tracking-wider mb-1 block opacity-60">
-                      Target Exam / Interest
-                    </label>
-                    <select
-                      value={formData.examInterest}
-                      onChange={(e) => setFormData({ ...formData, examInterest: e.target.value })}
-                      className="w-full bg-slate-100/80 border-none px-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-brand-accent focus:bg-slate-50 cursor-pointer"
-                    >
-                      <option value="JEE Entrance">JEE (Engineering Mains & Advanced)</option>
-                      <option value="NEET Entrance">NEET (Medical Entrance)</option>
-                      <option value="UPSC / NDA">UPSC Civil Services & Defence</option>
-                      <option value="Banking Exams">Banking (IBPS, SBI PO & Clerk)</option>
-                      <option value="SSC Exams">SSC (CGL, CHSL, MTS)</option>
-                      <option value="Railways RRB">Railways (RRB NTPC, Group D)</option>
-                      <option value="CUET UG">CUET (Undergraduate College Prep)</option>
-                      <option value="Government Prep">Teaching (CTET) & State PCS</option>
-                      <option value="School Boards">Class 10-12 School Boards</option>
-                      <option value="Other Exams">Other Vocational & Aptitude Exams</option>
-                    </select>
-                  </div>
-
-                  {/* Form Submission Button */}
-                  <div className="pt-2">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      type="submit"
-                      disabled={isSubmittingForm}
-                      className="w-full bg-brand-accent hover:bg-brand-accent-hover text-white font-display font-black py-4 rounded-xl shadow-lg shadow-brand-accent/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer text-base uppercase tracking-tighter disabled:opacity-50"
-                    >
-                      {isSubmittingForm ? (
-                        <RefreshCw className="w-5 h-5 animate-spin" />
-                      ) : (
-                        <Send className="w-4 h-4 fill-current" />
-                      )}
-                      {isSubmittingForm ? "Submitting..." : "Get My 80% OFF Now"}
-                    </motion.button>
-                  </div>
-
-                  <p className="text-[10px] text-slate-400 text-center">
-                    🔒 No spam. We'll contact you within 30 minutes via WhatsApp.
-                  </p>
-                </form>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white border-2 border-emerald-500/20 p-8 rounded-3xl shadow-xl text-center space-y-6"
-                >
-                  <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto border border-emerald-200">
-                    <CheckCircle2 className="w-10 h-10 stroke-[2.5]" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <h3 className="font-display font-extrabold text-xl text-slate-900">
-                      Offer Secured Successfully!
-                    </h3>
-                    <p className="text-sm text-slate-600 max-w-sm mx-auto">
-                      Thank you, <strong className="text-slate-800">{formData.name}</strong>. We have registered your discount reservation for <strong className="text-slate-800">{formData.examInterest}</strong>.
-                    </p>
-                  </div>
-
-                  {sheetSyncStatus && (
-                    <div className={`p-3 rounded-xl text-xs max-w-sm mx-auto flex items-center gap-2 justify-center font-semibold ${
-                      sheetSyncStatus.status === "success" 
-                        ? "bg-emerald-50 text-emerald-700 border border-emerald-100" 
-                        : "bg-amber-50 text-amber-700 border border-amber-100"
-                    }`}>
-                      <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${sheetSyncStatus.status === "success" ? "text-emerald-500" : "text-amber-500"}`} />
-                      <span>{sheetSyncStatus.message}</span>
-                    </div>
-                  )}
-
-                  <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 text-xs space-y-2.5 max-w-sm mx-auto text-left">
-                    <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
-                      <span className="text-slate-400 uppercase font-bold tracking-wider text-[9px]">Discount Ticket</span>
-                      <span className="text-brand-accent font-bold">₹1200 Special Promo Locked</span>
-                    </div>
-                    <div className="text-slate-600 space-y-1">
-                      <p>• Verified phone: <strong className="text-slate-800">+91 {formData.whatsapp}</strong></p>
-                      <p>• A support counselor will message you shortly to complete dashboard credential setups.</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <button
-                      onClick={handleWhatsAppAction}
-                      className="bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold px-6 py-3.5 rounded-xl shadow-md transition-colors duration-200 text-sm flex items-center justify-center gap-2 mx-auto cursor-pointer"
-                    >
-                      <MessageSquare className="w-4 h-4 fill-white/10" />
-                      Verify Immediately via WhatsApp Chat
-                    </button>
-                    <p className="text-[10px] text-slate-400 mt-2.5">
-                      Skip the queue by texting us directly to speed up activation.
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </motion.div>
-          )}
-
-          {activeTab === "whatsapp" && (
-            <motion.div
-              key="whatsapp-tab"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-              className="bg-white border border-slate-200 p-8 rounded-3xl shadow-xl text-center space-y-6 max-w-xl mx-auto"
-            >
-              <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto border border-emerald-100">
-                <MessageSquare className="w-9 h-9 fill-emerald-500/20" />
+          {!formSubmitted ? (
+            <form onSubmit={handleFormSubmit} className="space-y-6">
+              
+              <div className="flex items-center justify-between border-b border-slate-700/80 pb-3">
+                <h3 className="font-extrabold text-sm uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                  <User className="w-4 h-4" /> Candidate Information
+                </h3>
+                <span className="text-[10px] text-slate-400">* All 5 fields are required</span>
               </div>
 
-              <div className="space-y-2">
-                <h3 className="font-display font-extrabold text-lg text-slate-900">
-                  Instant Access via WhatsApp Chat
+              {/* 1. Candidate Name */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-blue-400" /> Candidate Name <span className="text-amber-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Enter your full name (e.g. Rajesh Kumar)"
+                  value={formData.name}
+                  onChange={(e) => {
+                    setFormData({ ...formData, name: e.target.value });
+                    if (errors.name) setErrors({ ...errors, name: undefined });
+                  }}
+                  className={`w-full bg-slate-900/90 border border-slate-700 text-white px-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:border-amber-400 ${
+                    errors.name ? "border-red-500 focus:ring-red-400" : "focus:ring-amber-400/50"
+                  }`}
+                />
+                {errors.name && (
+                  <p className="text-xs text-red-400 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3.5 h-3.5" /> {errors.name}
+                  </p>
+                )}
+              </div>
+
+              {/* 2. WhatsApp No */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-emerald-400" /> WhatsApp Number <span className="text-amber-400">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-sm border-r border-slate-700 pr-2.5">
+                    +91
+                  </div>
+                  <input
+                    type="tel"
+                    maxLength={10}
+                    required
+                    placeholder="10-digit WhatsApp No."
+                    value={formData.whatsapp}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      setFormData({ ...formData, whatsapp: val });
+                      if (errors.phone) setErrors({ ...errors, phone: undefined });
+                    }}
+                    className={`w-full bg-slate-900/90 border border-slate-700 text-white pl-16 pr-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 ${
+                      errors.phone ? "border-red-500 focus:ring-red-400" : "focus:ring-amber-400/50"
+                    }`}
+                  />
+                </div>
+                {errors.phone ? (
+                  <p className="text-xs text-red-400 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3.5 h-3.5" /> {errors.phone}
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-slate-400">
+                    HR team will contact you directly on this WhatsApp number regarding interview scheduling.
+                  </p>
+                )}
+              </div>
+
+              {/* 3. Qualification (input type=text) */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                  <GraduationCap className="w-3.5 h-3.5 text-amber-400" /> Qualification <span className="text-amber-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. M.Sc Psychology / B.Sc MLT / Diploma / B.E / B.Tech"
+                  value={formData.qualification}
+                  onChange={(e) => {
+                    setFormData({ ...formData, qualification: e.target.value });
+                    if (errors.qualification) setErrors({ ...errors, qualification: undefined });
+                  }}
+                  className={`w-full bg-slate-900/90 border border-slate-700 text-white px-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 ${
+                    errors.qualification ? "border-red-500 focus:ring-red-400" : "focus:ring-amber-400/50"
+                  }`}
+                />
+                {errors.qualification && (
+                  <p className="text-xs text-red-400 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3.5 h-3.5" /> {errors.qualification}
+                  </p>
+                )}
+              </div>
+
+              {/* 4. Position / Role */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                  <Briefcase className="w-3.5 h-3.5 text-purple-400" /> Position / Role Applied For <span className="text-amber-400">*</span>
+                </label>
+                <select
+                  value={formData.position}
+                  onChange={(e) => {
+                    setFormData({ ...formData, position: e.target.value });
+                    if (errors.position) setErrors({ ...errors, position: undefined });
+                  }}
+                  className="w-full bg-slate-900/90 border border-slate-700 text-white px-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-amber-400/50 cursor-pointer"
+                >
+                  <option value="Educational Counsellor">Educational Counsellor</option>
+                  <option value="Lab Assistant / Technician">Medical Lab Technician (Lab Assistant / Tech)</option>
+                  <option value="Technician - Green Technology and Renewable Energy">Technician - Green Technology & Renewable Energy</option>
+                  <option value="IIT, Advanced JEE Trainer & NEET Trainers">IIT-JEE (Main & Advanced) / NEET Faculty</option>
+                  <option value="Other / General Application">Other / General Application</option>
+                </select>
+                {errors.position && (
+                  <p className="text-xs text-red-400 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3.5 h-3.5" /> {errors.position}
+                  </p>
+                )}
+              </div>
+
+              {/* 5. City (input type=text) */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-rose-400" /> City / Preferred Location <span className="text-amber-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Thanjavur, Perambalur, Trichy, Ariyalur"
+                  value={formData.city}
+                  onChange={(e) => {
+                    setFormData({ ...formData, city: e.target.value });
+                    if (errors.city) setErrors({ ...errors, city: undefined });
+                  }}
+                  className={`w-full bg-slate-900/90 border border-slate-700 text-white px-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 ${
+                    errors.city ? "border-red-500 focus:ring-red-400" : "focus:ring-amber-400/50"
+                  }`}
+                />
+                
+                {/* Quick Selection Location Pills */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Popular:</span>
+                  {["Thanjavur", "Perambalur", "Trichy", "Ariyalur"].map((city) => (
+                    <button
+                      key={city}
+                      type="button"
+                      onClick={() => {
+                        setFormData({ ...formData, city });
+                        if (errors.city) setErrors({ ...errors, city: undefined });
+                      }}
+                      className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full transition-all border cursor-pointer ${
+                        formData.city === city
+                          ? "bg-amber-400 text-slate-950 border-amber-400 font-bold"
+                          : "bg-slate-800/80 text-slate-300 border-slate-700 hover:border-amber-400/60"
+                      }`}
+                    >
+                      {city}
+                    </button>
+                  ))}
+                </div>
+
+                {errors.city && (
+                  <p className="text-xs text-red-400 flex items-center gap-1 font-medium">
+                    <AlertCircle className="w-3.5 h-3.5" /> {errors.city}
+                  </p>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-2">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={isSubmittingForm}
+                  className="w-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-black py-4 rounded-xl shadow-xl shadow-amber-400/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer text-base uppercase tracking-wider disabled:opacity-50"
+                >
+                  {isSubmittingForm ? (
+                    <RefreshCw className="w-5 h-5 animate-spin text-slate-950" />
+                  ) : (
+                    <Send className="w-5 h-5 fill-slate-950" />
+                  )}
+                  {isSubmittingForm ? "Submitting Application..." : "Submit Job Application"}
+                </motion.button>
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-700/60">
+                <span>🔒 Your candidate data is stored securely.</span>
+                <button
+                  type="button"
+                  onClick={onWhatsAppClick}
+                  className="text-emerald-400 hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" /> Chat directly on WhatsApp
+                </button>
+              </div>
+
+            </form>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="py-6 text-center space-y-6"
+            >
+              <div className="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto border-2 border-emerald-500/40 shadow-lg">
+                <CheckCircle2 className="w-12 h-12 stroke-[2.5]" />
+              </div>
+
+              <div className="space-y-2 max-w-md mx-auto">
+                <h3 className="font-extrabold text-2xl text-white">
+                  Application Submitted Successfully!
                 </h3>
-                <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
-                  Avoid filling forms entirely! Click below to send a pre-filled text query to our admissions desk to claim your ₹1200 package discount instantly.
+                <p className="text-sm text-slate-300">
+                  Thank you, <strong className="text-amber-400">{formData.name}</strong>. Your job application for <strong className="text-amber-400">{formData.position}</strong> has been registered with Vizion India.
                 </p>
               </div>
 
-              <div className="bg-slate-50 border border-slate-200/50 p-4 rounded-2xl max-w-md mx-auto text-left flex gap-3.5 items-start">
-                <span className="text-slate-400 bg-white border rounded-lg p-2 flex-shrink-0 font-mono text-xs font-bold uppercase">
-                  SMS
-                </span>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-800">Pre-filled text message we will send:</h4>
-                  <p className="text-xs text-slate-500 italic mt-1 font-sans">
-                    "Hi Vizion India, I clicked your Meta Ad. I want to secure the ₹1200 All-India Exam Prep Offer. Please activate my trial."
-                  </p>
+              {sheetSyncStatus && (
+                <div className={`p-3 rounded-xl text-xs max-w-md mx-auto flex items-center gap-2 justify-center font-semibold ${
+                  sheetSyncStatus.status === "success" 
+                    ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30" 
+                    : "bg-amber-500/10 text-amber-300 border border-amber-500/30"
+                }`}>
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-400" />
+                  <span>{sheetSyncStatus.message}</span>
+                </div>
+              )}
+
+              <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-4 text-xs space-y-2 max-w-md mx-auto text-left">
+                <div className="flex justify-between border-b border-slate-700 pb-2">
+                  <span className="text-slate-400 uppercase font-bold text-[10px]">Candidate Details Summary</span>
+                  <span className="text-emerald-400 font-bold">Status: Received</span>
+                </div>
+                <div className="text-slate-300 space-y-1 pt-1">
+                  <p>• <strong>Name:</strong> {formData.name}</p>
+                  <p>• <strong>WhatsApp:</strong> +91 {formData.whatsapp}</p>
+                  <p>• <strong>Qualification:</strong> {formData.qualification}</p>
+                  <p>• <strong>Applied Position:</strong> {formData.position}</p>
+                  <p>• <strong>City:</strong> {formData.city}</p>
                 </div>
               </div>
 
               <div>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleWhatsAppAction}
-                  className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-display font-bold text-base px-8 py-4 rounded-xl shadow-lg shadow-emerald-500/20 transition-all duration-200 flex items-center justify-center gap-2 mx-auto cursor-pointer"
+                <button
+                  onClick={onWhatsAppClick}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-6 py-3.5 rounded-xl shadow-lg transition-colors text-sm flex items-center justify-center gap-2 mx-auto cursor-pointer"
                 >
-                  <Phone className="w-4 h-4 fill-current" />
-                  Launch WhatsApp Chat Now
-                </motion.button>
+                  <MessageSquare className="w-4 h-4 fill-slate-950" />
+                  Contact HR Instantly via WhatsApp
+                </button>
               </div>
-
-              <p className="text-[10px] text-slate-400">
-                Admissions WhatsApp Support Desk is active: <strong>9:00 AM - 10:00 PM (IST)</strong>
-              </p>
             </motion.div>
           )}
-        </AnimatePresence>
+
+        </div>
+
       </div>
     </section>
   );

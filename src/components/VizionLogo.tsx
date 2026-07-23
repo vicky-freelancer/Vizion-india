@@ -17,22 +17,22 @@ export default function VizionLogo({ light = false, className = "", showText = t
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
       >
-        {/* Upper Lid: Bold Indian Saffron */}
+        {/* Upper Lid Arc: Indian Saffron / Orange */}
         <path
-          d="M4,34 C16,10 84,10 96,34 C76,22 24,22 4,34 Z"
-          fill="#FF9933"
+          d="M 10,28 C 25,10 75,10 90,28 C 72,16 28,16 10,28 Z"
+          fill="#FF7700"
         />
-        {/* Pupil: Pristine Blue Circle */}
+        {/* Pupil / Iris: Royal Indian Blue Circle */}
         <circle
           cx="50"
           cy="30"
-          r="15"
-          fill="#00A3E0"
+          r="12"
+          fill="#0055D4"
         />
-        {/* Lower Lid: Bold Indian Green */}
+        {/* Lower Lid Arc: Indian Emerald Green */}
         <path
-          d="M4,34 C16,58 84,58 96,34 C76,46 24,46 4,34 Z"
-          fill="#138808"
+          d="M 10,32 C 25,50 75,50 90,32 C 72,44 28,44 10,32 Z"
+          fill="#009944"
         />
       </svg>
       

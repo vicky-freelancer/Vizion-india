@@ -1,6 +1,6 @@
 {
-  "name": "Vizion India Landing Page",
-  "description": "High-converting All-India education portal exam prep landing page with limited-time offer, urgency timer, and multi-channel lead options.",
+  "name": "Sukrith Learning Recruitment Portal",
+  "description": "Official job recruitment portal for Sukrith Learning OPC Private Limited - Tamil Nadu with hiring posters and candidate application form.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
