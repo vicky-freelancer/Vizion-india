@@ -19,6 +19,9 @@ export default function Navbar({ onApplyClick, onWhatsAppClick }: NavbarProps) {
             className="h-11 sm:h-12 w-auto object-contain rounded transition-all"
             referrerPolicy="no-referrer"
           />
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-blue-950 font-display flex items-center group-hover:text-blue-800 transition-colors">
+            Vizion India
+          </h1>
         </div>
 
         {/* Right Nav Action Buttons */}
