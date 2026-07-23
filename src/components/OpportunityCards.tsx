@@ -28,7 +28,7 @@ export const OPPORTUNITY_ITEMS: OpportunityItem[] = [
     positionLabel: "Educational Counsellor",
     theme: "blue",
     icon: UserCheck,
-    imageUrl: "public/Education Counsellors (1).jpg",
+    imageUrl: "/Education Counsellors (1).jpg",
     bullets: [
       "Guide students and parents regarding educational programs.",
       "Explain course details, admission procedures, and career opportunities.",
