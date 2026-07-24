@@ -36,15 +36,22 @@ export default function HeroSection({ onApplyClick, onWhatsAppClick }: HeroSecti
             </div>
 
             {/* Roles List Headline */}
-            <div className="space-y-1 font-black text-slate-900 text-sm sm:text-base md:text-lg leading-snug uppercase tracking-tight">
-              <p className="text-blue-900">
-                EDUCATIONAL COUNSELLOR <span className="text-slate-400 font-normal">|</span> MEDICAL LAB TECHNICIAN
+            <div className="space-y-2 font-black text-slate-900 text-sm sm:text-base md:text-lg leading-snug uppercase tracking-tight bg-white/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/90 shadow-sm">
+              <p className="text-blue-900 flex items-center gap-2">
+                <span className="text-blue-600 font-black min-w-[1.5rem] text-base sm:text-lg">1.</span>
+                <span>EDUCATIONAL COUNSELLOR</span>
               </p>
-              <p className="text-amber-700">
-                TECHNICIAN – GREEN TECHNOLOGY & RENEWABLE ENERGY
+              <p className="text-emerald-800 flex items-center gap-2">
+                <span className="text-emerald-600 font-black min-w-[1.5rem] text-base sm:text-lg">2.</span>
+                <span>MEDICAL LAB TECHNICIAN</span>
               </p>
-              <p className="text-purple-900">
-                IIT-JEE (MAIN & ADVANCED) / NEET FACULTY
+              <p className="text-amber-700 flex items-center gap-2">
+                <span className="text-amber-600 font-black min-w-[1.5rem] text-base sm:text-lg">3.</span>
+                <span>GREEN TECHNOLOGY &amp; RENEWABLE ENERGY(TECHNICIAN)</span>
+              </p>
+              <p className="text-purple-900 flex items-center gap-2">
+                <span className="text-purple-600 font-black min-w-[1.5rem] text-base sm:text-lg">4.</span>
+                <span>IIT-JEE (MAIN &amp; ADVANCED) / NEET FACULTY</span>
               </p>
             </div>
 
