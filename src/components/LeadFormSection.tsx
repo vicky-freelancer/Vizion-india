@@ -190,7 +190,7 @@ export default function LeadFormSection({ onWhatsAppClick, selectedPosition }: L
 
               {/* 1. Candidate Name */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5 text-blue-400" /> Candidate Name <span className="text-amber-400">*</span>
                 </label>
                 <input
@@ -202,8 +202,8 @@ export default function LeadFormSection({ onWhatsAppClick, selectedPosition }: L
                     setFormData({ ...formData, name: e.target.value });
                     if (errors.name) setErrors({ ...errors, name: undefined });
                   }}
-                  className={`w-full bg-slate-900/90 border border-slate-700 text-white px-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:border-amber-400 ${
-                    errors.name ? "border-red-500 focus:ring-red-400" : "focus:ring-amber-400/50"
+                  className={`w-full bg-white border border-slate-300 text-slate-900 placeholder:text-slate-500 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${
+                    errors.name ? "border-red-500 focus:ring-red-400" : "focus:ring-amber-400 focus:border-amber-400"
                   }`}
                 />
                 {errors.name && (
@@ -213,13 +213,13 @@ export default function LeadFormSection({ onWhatsAppClick, selectedPosition }: L
                 )}
               </div>
 
-              {/* 2. WhatsApp No */}
+               {/* 2. WhatsApp No */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
                   <Phone className="w-3.5 h-3.5 text-emerald-400" /> WhatsApp Number <span className="text-amber-400">*</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 font-bold text-sm border-r border-slate-700 pr-2.5">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-700 font-bold text-sm border-r border-slate-300 pr-2.5">
                     +91
                   </div>
                   <input
@@ -233,8 +233,8 @@ export default function LeadFormSection({ onWhatsAppClick, selectedPosition }: L
                       setFormData({ ...formData, whatsapp: val });
                       if (errors.phone) setErrors({ ...errors, phone: undefined });
                     }}
-                    className={`w-full bg-slate-900/90 border border-slate-700 text-white pl-16 pr-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 ${
-                      errors.phone ? "border-red-500 focus:ring-red-400" : "focus:ring-amber-400/50"
+                    className={`w-full bg-white border border-slate-300 text-slate-900 placeholder:text-slate-500 pl-16 pr-4 py-3.5 rounded-xl text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${
+                      errors.phone ? "border-red-500 focus:ring-red-400" : "focus:ring-amber-400 focus:border-amber-400"
                     }`}
                   />
                 </div>
@@ -243,7 +243,7 @@ export default function LeadFormSection({ onWhatsAppClick, selectedPosition }: L
                     <AlertCircle className="w-3.5 h-3.5" /> {errors.phone}
                   </p>
                 ) : (
-                  <p className="text-[10px] text-slate-400">
+                  <p className="text-[10px] text-slate-300">
                     HR team will contact you directly on this WhatsApp number regarding interview scheduling.
                   </p>
                 )}
@@ -251,7 +251,7 @@ export default function LeadFormSection({ onWhatsAppClick, selectedPosition }: L
 
               {/* 3. Qualification (input type=text) */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
                   <GraduationCap className="w-3.5 h-3.5 text-amber-400" /> Qualification <span className="text-amber-400">*</span>
                 </label>
                 <input
@@ -263,8 +263,8 @@ export default function LeadFormSection({ onWhatsAppClick, selectedPosition }: L
                     setFormData({ ...formData, qualification: e.target.value });
                     if (errors.qualification) setErrors({ ...errors, qualification: undefined });
                   }}
-                  className={`w-full bg-slate-900/90 border border-slate-700 text-white px-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 ${
-                    errors.qualification ? "border-red-500 focus:ring-red-400" : "focus:ring-amber-400/50"
+                  className={`w-full bg-white border border-slate-300 text-slate-900 placeholder:text-slate-500 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${
+                    errors.qualification ? "border-red-500 focus:ring-red-400" : "focus:ring-amber-400 focus:border-amber-400"
                   }`}
                 />
                 {errors.qualification && (
@@ -276,7 +276,7 @@ export default function LeadFormSection({ onWhatsAppClick, selectedPosition }: L
 
               {/* 4. Position / Role */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
                   <Briefcase className="w-3.5 h-3.5 text-purple-400" /> Position / Role Applied For <span className="text-amber-400">*</span>
                 </label>
                 <select
@@ -285,13 +285,13 @@ export default function LeadFormSection({ onWhatsAppClick, selectedPosition }: L
                     setFormData({ ...formData, position: e.target.value });
                     if (errors.position) setErrors({ ...errors, position: undefined });
                   }}
-                  className="w-full bg-slate-900/90 border border-slate-700 text-white px-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-amber-400/50 cursor-pointer"
+                  className="w-full bg-white border border-slate-300 text-slate-900 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 cursor-pointer"
                 >
-                  <option value="Educational Counsellor">Educational Counsellor</option>
-                  <option value="Lab Assistant / Technician">Medical Lab Technician (Lab Assistant / Tech)</option>
-                  <option value="Technician - Green Technology and Renewable Energy">Technician - Green Technology & Renewable Energy</option>
-                  <option value="IIT, Advanced JEE Trainer & NEET Trainers">IIT-JEE (Main & Advanced) / NEET Faculty</option>
-                  <option value="Other / General Application">Other / General Application</option>
+                  <option value="Educational Counsellor" className="bg-white text-slate-900">Educational Counsellor</option>
+                  <option value="Lab Assistant / Technician" className="bg-white text-slate-900">Medical Lab Technician (Lab Assistant / Tech)</option>
+                  <option value="Technician - Green Technology and Renewable Energy" className="bg-white text-slate-900">Technician - Green Technology & Renewable Energy</option>
+                  <option value="IIT, Advanced JEE Trainer & NEET Trainers" className="bg-white text-slate-900">IIT-JEE (Main & Advanced) / NEET Faculty</option>
+                  <option value="Other / General Application" className="bg-white text-slate-900">Other / General Application</option>
                 </select>
                 {errors.position && (
                   <p className="text-xs text-red-400 flex items-center gap-1 font-medium">
@@ -302,7 +302,7 @@ export default function LeadFormSection({ onWhatsAppClick, selectedPosition }: L
 
               {/* 5. City (input type=text) */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-rose-400" /> City / Preferred Location <span className="text-amber-400">*</span>
                 </label>
                 <input
@@ -314,8 +314,8 @@ export default function LeadFormSection({ onWhatsAppClick, selectedPosition }: L
                     setFormData({ ...formData, city: e.target.value });
                     if (errors.city) setErrors({ ...errors, city: undefined });
                   }}
-                  className={`w-full bg-slate-900/90 border border-slate-700 text-white px-4 py-3.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 ${
-                    errors.city ? "border-red-500 focus:ring-red-400" : "focus:ring-amber-400/50"
+                  className={`w-full bg-white border border-slate-300 text-slate-900 placeholder:text-slate-500 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all focus:outline-none focus:ring-2 ${
+                    errors.city ? "border-red-500 focus:ring-red-400" : "focus:ring-amber-400 focus:border-amber-400"
                   }`}
                 />
                 
